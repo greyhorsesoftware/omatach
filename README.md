@@ -2,8 +2,9 @@
 
 [![Built for Omarchy](https://raw.githubusercontent.com/tcballard/omarchy-badges/85f859029e236e784e7b05ada6dbe73506d07a91/badges/v1/built-for-omarchy.svg)](https://github.com/tcballard/omarchy-badges)
 
-A terminal OBD-II dashboard for [Omarchy](https://omarchy.org) — vehicle info,
-live gauges and trouble codes, in a tile, with OBDLink adapters. Free donationware.
+A terminal OBD-II dashboard — vehicle info, live gauges and trouble codes, in a
+tile, with OBDLink adapters. Built for [Omarchy](https://omarchy.org) and at
+home on any modern Linux. Free donationware.
 
 ![omatach dashboard — dial, bar and big-digit gauges](docs/images/dash.png)
 
@@ -19,6 +20,22 @@ omatach
 That verifies the release against its published SHA-256 and installs to
 `~/.local/bin`, no sudo. `install.sh --help` documents `--prefix`, `--version`
 and `--uninstall`; pass flags through the pipe with `bash -s -- --prefix /usr/local`.
+
+Nothing about omatach is Omarchy-specific — it is a terminal program that takes
+its colours from your terminal palette. The binary needs only `libc`, `libm` and
+`libgcc_s`; libdbus is compiled in, so there is no system D-Bus library to
+install. That covers current distributions:
+
+| | |
+|---|---|
+| Works | Arch and Omarchy, Debian 12+, Ubuntu 22.04+, Fedora 36+, RHEL 9 / Rocky / Alma, Amazon Linux 2023, openSUSE — anything with glibc 2.34 or newer |
+| Build from source instead | musl distributions such as Alpine; anything older than glibc 2.34 (Ubuntu 20.04, Debian 11, RHEL 8); 32-bit ARM |
+
+`install.sh` checks the architecture and the glibc version before it writes
+anything, so on an unsupported system it tells you and points at the source
+build rather than installing a binary that cannot start.
+
+Bluetooth adapters need `bluez` running. USB and WiFi adapters do not.
 
 From source — needs a C toolchain, since the one native library (libdbus) is
 built in rather than linked:
@@ -81,6 +98,11 @@ Dashboard layouts are saved per vehicle under `~/.config/omatach/dashboards/`.
 Tested and working on the OBDLink hardware — USB, WiFi, Bluetooth LE and
 Bluetooth classic — as well as against the demo adapter. USB and WiFi share the
 transport path already proven in RevOBD.
+
+Developed and daily-driven on Omarchy, x86_64. Every release is also built and
+installed on Ubuntu 22.04 in CI, which is what the published binaries are
+compiled against. The aarch64 build is cross-compiled and published alongside
+x86_64; it gets less real-world use, so reports from ARM hardware are welcome.
 
 ## Support
 
