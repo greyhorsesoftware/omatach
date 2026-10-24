@@ -22,17 +22,11 @@ live gauges and trouble codes, in a tile, with OBDLink adapters. Free donationwa
 
 ## Install
 
-Arch / Omarchy:
-
-```
-yay -S omatach-bin        # or Omarchy menu → Install → Package
-omatach
-```
-
-Any other Linux — x86_64 or aarch64, glibc 2.34 or newer:
+Linux, x86_64 or aarch64, glibc 2.34 or newer:
 
 ```
 curl -fsSL https://raw.githubusercontent.com/greyhorsesoftware/omatach/main/install.sh | bash
+omatach
 ```
 
 That verifies the release against its published SHA-256 and installs to
