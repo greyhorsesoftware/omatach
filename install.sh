@@ -17,8 +17,11 @@ set -euo pipefail
 
 # Overridable so a fork, a mirror or a pre-release can be installed without editing this.
 REPO="${OMATACH_REPO:-greyhorsesoftware/omatach}"
-# The release builder runs on ubuntu-22.04, which sets the floor for both arches.
-GLIBC_FLOOR="2.35"
+# Measured from the release binary, not assumed from the build host: the highest
+# glibc symbol version it references is 2.34 (`objdump -T omatach | grep GLIBC_`).
+# That matters — 2.34 is what RHEL 9, Rocky/Alma 9 and Amazon Linux 2023 ship, so
+# a floor of 2.35 would refuse them for no reason. Re-measure if the toolchain moves.
+GLIBC_FLOOR="2.34"
 
 PREFIX="${HOME}/.local"
 VERSION=""

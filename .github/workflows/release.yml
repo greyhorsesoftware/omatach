@@ -6,7 +6,8 @@
 # no token is needed to fetch them. Publishing uses the default GITHUB_TOKEN.
 # The vault data is committed under data/.
 #
-# ubuntu-22.04 sets the glibc floor (2.35) for both arches. libdbus is built
+# ubuntu-22.04 is the build host; the binary itself references glibc symbols up
+# to 2.34, which is the real runtime floor install.sh enforces. libdbus is built
 # from source (the `dbus` crate's vendored feature), so the aarch64 build is a
 # plain cross-compile needing only gcc-aarch64-linux-gnu.
 name: release
@@ -84,7 +85,7 @@ jobs:
             dist/*.sha256
 
   # Install the release we just published, the way a user would. ubuntu-22.04 is
-  # also the glibc floor (2.35), so this exercises the version check too.
+  # near the glibc floor, so this exercises the version check too.
   verify-install:
     needs: publish
     if: github.event_name == 'push' || inputs.publish
