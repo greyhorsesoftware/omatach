@@ -5,20 +5,7 @@
 A terminal OBD-II dashboard for [Omarchy](https://omarchy.org) — vehicle info,
 live gauges and trouble codes, in a tile, with OBDLink adapters. Free donationware.
 
-```
-─── omatach · OMA11BIT000000001 · CAN 11/500 ······································ ● connected ───
-
-  RPM                        rpm  SPEED                     km/h  ECT                         °C
-            ⣀⡠⠤⠤⢤⠤⠤⠤⢄⡀                                            ████████████░░░░░░░░░░░  91.0
-         ⣀⠔⠉    ⠘    ⠈⠑⢄⡀                                          ▅▇▇▃     ▅▇▆▃    ▁▅█▆▂
-       ⡠⢪               ⢨⠢⡀                                       █████▆▂▁▄█████▆▂▁▄█████▅
-      ⡎  ⠁              ⠁ ⠈⡆              ╷ ╷ ╶─┐   ┌─┐
-     ⡜ ⠠⢄⡀                 ⠘⡄             └─┤   │   │ │
-    ⢰⠁   ⠈⠑⠢⢄⡀              ⢱               ╵   ╵ ▪ └─┘
-    ⣜⣀⡀      ⠈⠑⠢⣄⡀         ⣀⣘⡄
-               2340
- + add    - remove    ←→ select    s style    u units    R record    i info    t trouble    ? help    q quit
-```
+![omatach dashboard — dial, bar and big-digit gauges](docs/images/dash.png)
 
 ## Install
 
@@ -56,6 +43,10 @@ lists what it finds; `↵` connects.
 | `d` | Dashboard | gauges in three styles — dial, bar + sparkline, big digits. `+` picks PIDs, `s` cycles style, `u` metric/imperial, `R` records |
 | `i` | Vehicle Info | VIN, protocol, ECUs with calibration ids, supported PIDs |
 | `t` | Trouble Codes | stored / pending / permanent with descriptions (J1979 + Ford / GM / FCA libraries); `x` clears, with a key-on-engine-off confirm |
+
+![Vehicle Info — VIN, protocol, ECUs with calibration ids, supported PIDs](docs/images/vehicleinfo.png)
+
+![Trouble Codes — stored, pending and permanent, with descriptions](docs/images/troublecodes.png)
 
 `/` opens a command palette, `?` lists every key, `$` is the tip jar, `q` quits.
 Colours come from your terminal palette, so an Omarchy theme switch recolours it live.
