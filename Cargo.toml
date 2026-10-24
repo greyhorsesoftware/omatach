@@ -1,0 +1,55 @@
+[package]
+name = "omatach"
+version = "1.0.0"
+edition = "2021"
+description = "Terminal OBD-II dashboard for Omarchy (OBDLink adapters)"
+license = "MIT OR Apache-2.0"
+authors = ["Grey Horse Software <info@greyhorsesoftware.com>"]
+homepage = "https://greyhorsesoftware.com"
+repository = "https://github.com/greyhorsesoftware/omatach"
+readme = "README.md"
+keywords = ["obd", "obd-ii", "automotive", "tui", "omarchy"]
+categories = ["command-line-utilities", "hardware-support"]
+# Distributed as a release binary / AUR package, not on crates.io.
+publish = false
+
+[dependencies]
+# session engine + ble (btleplug) + bluetooth-classic (Linux RFCOMM); the mac build enables neither.
+# Pinned to a tag, not a branch: a clone of this repo builds without sibling checkouts.
+obd_session_rs  = { git = "https://github.com/greyhorsesoftware/obd_session_rs", tag = "v1.3.0", features = ["full-bluetooth"] }
+# equation evaluator (its own crate; the session does NOT re-export it). It lives in the
+# equation_rs/ subdirectory of its repo — cargo finds it by package name.
+obd_equation_rs = { git = "https://github.com/greyhorsesoftware/obd_equation_rs", tag = "v1.0.0" }
+serde      = { version = "1", features = ["derive"] }
+serde_json = "1"
+flate2     = "1"
+crc32fast  = "1"
+ratatui    = "0.29"
+crossterm  = "0.28"
+directories = "5"
+libc       = "0.2"
+toml       = "0.8"
+uuid       = "1"
+qrcode     = { version = "0.14", default-features = false }
+
+# Linux only: build libdbus from source (the BLE transport's one native
+# library) so the aarch64 cross-build needs nothing but the C toolchain, and
+# the binary does not need libdbus-1.so at runtime either.
+[target.'cfg(target_os = "linux")'.dependencies]
+dbus = { version = "0.9", features = ["vendored"] }
+
+[build-dependencies]
+flate2    = "1"
+crc32fast = "1"
+toml      = "0.8"
+serde_json = "1"
+# NOTE: the scale/offset → equation generator is INLINED below (a port of
+# obd_equation_rs::generator::generate_equation) — depending on the equation
+# crate from build.rs too made cargo emit "output filename collision" warnings
+# (same package as build-dep and dep, cdylib/staticlib names are unhashed).
+
+[profile.release]
+lto = "fat"
+codegen-units = 1
+strip = true
+opt-level = 3

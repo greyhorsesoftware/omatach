@@ -1,0 +1,19 @@
+omatach — Copyright (c) 2025-2026 Grey Horse Software.
+Licensed under MIT OR Apache-2.0, at your option (see LICENSE-MIT and LICENSE-APACHE).
+
+The set of Mode 01 PIDs omatach ships is bounded by the Service 01 table in the
+Wikipedia article "OBD-II PIDs" (https://en.wikipedia.org/wiki/OBD-II_PIDs),
+licensed CC BY-SA 4.0. Only the PID numbers follow that article; the datapoint
+names, units, ranges and decode equations in data/j1979_catalog.json are Grey
+Horse Software's own work. See data/PROVENANCE.md.
+
+data/dtcs.json contains diagnostic trouble code descriptions: generic codes as
+defined by SAE J2012, and manufacturer-defined codes for Ford, FCA and GM.
+Manufacturer names are used for identification only. All trademarks are the
+property of their owners, and omatach is not affiliated with, endorsed by, or a
+product of any vehicle manufacturer.
+
+"OBDLink" is a trademark of OCTech / ScanTool.net. "Torque" refers to the Torque
+Android app's equation dialect, which obd_equation_rs implements independently
+for compatibility; Torque is a trademark of its owner. omatach is an independent
+product and is not affiliated with either.

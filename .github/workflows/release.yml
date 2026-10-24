@@ -1,0 +1,105 @@
+# Build the Linux release tarballs (x86_64 + aarch64) on a tag push or by hand,
+# then publish both to this repo's releases in one step.
+#
+# The engine crates are git deps pinned to tags (see Cargo.toml), so cargo
+# compiles them from source on the runner — nothing prebuilt is pulled in, and
+# no token is needed to fetch them. Publishing uses the default GITHUB_TOKEN.
+# The vault data is committed under data/.
+#
+# ubuntu-22.04 sets the glibc floor (2.35) for both arches. libdbus is built
+# from source (the `dbus` crate's vendored feature), so the aarch64 build is a
+# plain cross-compile needing only gcc-aarch64-linux-gnu.
+name: release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Attach the tarballs to a GitHub release (tag = v<Cargo version>)'
+        type: boolean
+        default: false
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            target: x86_64-unknown-linux-gnu
+          - arch: aarch64
+            target: aarch64-unknown-linux-gnu
+            cross: gcc-aarch64-linux-gnu
+    steps:
+      - uses: actions/checkout@v4
+      # A tag that disagrees with Cargo.toml would publish a release whose binary
+      # reports a different version than its own tag name. Fail before building.
+      - name: tag matches the Cargo version
+        if: github.event_name == 'push'
+        run: |
+          cargo_v="$(grep -m1 '^version' Cargo.toml | sed -E 's/.*"([^"]+)".*/\1/')"
+          tag_v="${GITHUB_REF_NAME#v}"
+          if [ "$cargo_v" != "$tag_v" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match Cargo.toml version ${cargo_v}"
+            exit 1
+          fi
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - run: sudo apt-get update && sudo apt-get install -y pkg-config ${{ matrix.cross }}
+      - name: build tarball (${{ matrix.arch }})
+        run: tools/release.sh ${{ matrix.target }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: omatach-${{ matrix.arch }}-linux
+          path: |
+            dist/*.tar.gz
+            dist/*.sha256
+
+  publish:
+    needs: build
+    if: github.event_name == 'push' || inputs.publish
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: read version
+        id: ver
+        run: echo "v=$(grep -m1 '^version' Cargo.toml | sed -E 's/.*"([^"]+)".*/\1/')" >> "$GITHUB_OUTPUT"
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - name: publish the release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event_name == 'push' && github.ref_name || format('v{0}', steps.ver.outputs.v) }}
+          name: omatach ${{ github.event_name == 'push' && github.ref_name || format('v{0}', steps.ver.outputs.v) }}
+          # release notes come from RELEASE_NOTES.md in this repo — edit it before tagging
+          body_path: RELEASE_NOTES.md
+          files: |
+            dist/*.tar.gz
+            dist/*.sha256
+
+  # Install the release we just published, the way a user would. ubuntu-22.04 is
+  # also the glibc floor (2.35), so this exercises the version check too.
+  verify-install:
+    needs: publish
+    if: github.event_name == 'push' || inputs.publish
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: read version
+        id: ver
+        run: echo "v=$(grep -m1 '^version' Cargo.toml | sed -E 's/.*"([^"]+)".*/\1/')" >> "$GITHUB_OUTPUT"
+      - name: install from the published release
+        run: ./install.sh --version ${{ steps.ver.outputs.v }}
+      - name: the installed binary runs and reports the right version
+        run: |
+          test "$("$HOME/.local/bin/omatach" --version)" = "omatach ${{ steps.ver.outputs.v }}"
+      - name: uninstall leaves nothing behind
+        run: |
+          ./install.sh --uninstall
+          test ! -e "$HOME/.local/bin/omatach"

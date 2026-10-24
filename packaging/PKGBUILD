@@ -1,0 +1,29 @@
+# Maintainer: Grey Horse Software <info@greyhorsesoftware.com>
+# omatach — terminal OBD-II dashboard for Omarchy (OBDLink adapters).
+# Binary package: installs the prebuilt, checksum-verified GitHub release.
+# Source: https://github.com/greyhorsesoftware/omatach (MIT OR Apache-2.0)
+pkgname=omatach-bin
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Terminal OBD-II dashboard for Omarchy — vehicle info, live gauges, trouble codes (OBDLink adapters)"
+arch=('x86_64' 'aarch64')
+url="https://github.com/greyhorsesoftware/omatach"
+license=('MIT OR Apache-2.0')
+depends=('glibc' 'bluez')
+optdepends=('bluez-utils: bluetoothctl for one-time pairing of classic-Bluetooth OBDLink MX+/LX'
+            'ghostty: a terminal that renders braille dials well (kitty/alacritty/wezterm also fine)')
+provides=('omatach')
+conflicts=('omatach')
+source_x86_64=("${url}/releases/download/v${pkgver}/omatach-${pkgver}-x86_64-linux.tar.gz")
+source_aarch64=("${url}/releases/download/v${pkgver}/omatach-${pkgver}-aarch64-linux.tar.gz")
+# `updpkgsums` fills both from the release's .sha256 files.
+sha256sums_x86_64=('SKIP')
+sha256sums_aarch64=('SKIP')
+
+package() {
+  cd "${srcdir}/omatach-${pkgver}-${CARCH}-linux"
+  install -Dm755 omatach "${pkgdir}/usr/bin/omatach"
+  install -Dm644 omatach.desktop "${pkgdir}/usr/share/applications/omatach.desktop"
+  install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+  install -Dm644 LICENSE-MIT LICENSE-APACHE -t "${pkgdir}/usr/share/licenses/${pkgname}/"
+}

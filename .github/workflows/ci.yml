@@ -1,0 +1,33 @@
+# Build + test on every push / PR — except changes that only touch docs or
+# markdown. The engine crates come in as git deps pinned to tags (see
+# Cargo.toml), so a plain checkout builds; nothing prebuilt is pulled in.
+name: ci
+on:
+  push:
+    branches: ['**']
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - 'packaging/**'
+      - '.gitignore'
+      - 'RELEASE_NOTES.md'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - 'packaging/**'
+      - '.gitignore'
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: sudo apt-get update && sudo apt-get install -y pkg-config
+      - name: build
+        run: cargo build --locked
+      - name: test
+        run: cargo test --locked
+      - name: no warnings in omatach itself (engine crates are not held to this)
+        run: cargo rustc --locked -- -D warnings

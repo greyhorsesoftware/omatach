@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=omatach
+GenericName=OBD-II Dashboard
+Comment=Vehicle info, live gauges and trouble codes in the terminal (OBDLink adapters)
+Exec=omatach
+Icon=utilities-terminal
+Terminal=true
+Categories=Utility;System;
+Keywords=OBD;OBD2;car;vehicle;diagnostics;tachometer;OBDLink;
+StartupWMClass=omatach

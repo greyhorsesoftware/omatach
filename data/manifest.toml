@@ -1,0 +1,17 @@
+# The vault manifest. entry name -> source path, relative to
+# this crate root. build.rs deflates every entry into $OUT_DIR/vault.bin and
+# emits one `pub const` per entry into vault_names.rs (a mistyped name fails at
+# compile time). Every source lives inside this crate (data/).
+[entries]
+"adapters.json"   = "data/adapters.json"
+"mock/11bit.json" = "data/mock/11bit.json"
+"mock/29bit.json" = "data/mock/29bit.json"
+# Committed data files, maintained by hand in this repo: the J1979 catalog, the
+# DTC libraries (one merged file) and the unit-conversion table.
+# j1979_catalog.json ships the Mode 01 PIDs that are publicly listed at
+# https://en.wikipedia.org/wiki/OBD-II_PIDs (Service 01 table, as of 2026-09-19:
+# 00-94, 98-A9, C0, C3-C8). Only the PID NUMBERS follow that page — every name,
+# unit and equation is ours. Keep new entries inside that set.
+"j1979_catalog.json"   = "data/j1979_catalog.json"
+"dtcs.json"            = "data/dtcs.json"
+"unitconversions.json" = "data/unitconversions.json"

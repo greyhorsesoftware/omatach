@@ -1,0 +1,30 @@
+{
+  "_comment": "omatach adapter catalog: the OBDLink devices omatach supports, in the schema obd_session_rs's Catalog::resolve matches against. ble/classic/wifi namePatterns match the advertised device name; usb.namePatterns match the connector NAME the engine's serial probe mints: FTDI ports are reported as 'USB serial adapter (ttyUSB0)' / '(cu.usbserial-XXXX)', so any such port resolves to STN facts (supportsPeriodic) and the STI read at init confirms it.",
+  "adapters": [
+    {
+      "name": "OBDLink CX",
+      "ble": {
+        "namePatterns": ["OBDLink"],
+        "serviceUUIDs": ["FFF0", "FFE0", "BEEF"],
+        "writeCharacteristicUUID": "FFF2",
+        "notifyCharacteristicUUID": "FFF1"
+      },
+      "supportsPeriodic": true
+    },
+    {
+      "name": "OBDLink MX / MX+",
+      "classic": { "namePatterns": ["OBDLink"] },
+      "supportsPeriodic": true
+    },
+    {
+      "name": "OBDLink MX WiFi",
+      "wifi": { "namePatterns": ["OBDLink MX WiFi", "192.168.0.10"] },
+      "supportsPeriodic": true
+    },
+    {
+      "name": "OBDLink EX / SX",
+      "usb": { "namePatterns": ["USB serial adapter", "usbserial", "ttyUSB", "OBDLink"] },
+      "supportsPeriodic": true
+    }
+  ]
+}
