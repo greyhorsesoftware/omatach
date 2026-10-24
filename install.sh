@@ -131,9 +131,22 @@ check_glibc() {
 
 resolve_version() {
   if [ -n "$VERSION" ]; then info "version ${VERSION} (pinned)"; return; fi
-  local api
+  local api body tag
   api="https://api.github.com/repos/${REPO}/releases/latest"
-  VERSION="$(fetch_stdout "$api" | grep -m1 '"tag_name"' | sed -E 's/.*"tag_name"[[:space:]]*:[[:space:]]*"v?([^"]+)".*/\1/')"
+  body="$(fetch_stdout "$api")"
+  # Parsed with shell expansion rather than `| grep -m1`: grep exits on the first
+  # match and closes the pipe while curl is still writing, which kills curl with
+  # error 23 and, under pipefail, aborts the install. Size-dependent, so it looks
+  # intermittent. No pipe here, so there is nothing to break.
+  case "$body" in
+    *'"tag_name"'*) ;;
+    *) die "no published release found at ${api} — pass --version X.Y.Z" ;;
+  esac
+  tag="${body#*\"tag_name\"}"       # everything past the key
+  tag="${tag#*:}"                   # past the colon
+  tag="${tag#*\"}"                  # past the opening quote
+  tag="${tag%%\"*}"                 # up to the closing quote
+  VERSION="${tag#v}"
   [ -n "$VERSION" ] || die "could not read the latest version from ${api} — pass --version X.Y.Z"
   info "version ${VERSION} (latest)"
 }
